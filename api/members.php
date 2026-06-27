@@ -2,8 +2,9 @@
 session_start();
 require_once __DIR__ . '/helpers.php';
 
-$membersFile = getDataFile('members.json');
-$members = file_exists($membersFile) ? json_decode(file_get_contents($membersFile), true) : [];
+$membersFileRead = getReadFile('members.json');
+$membersFileWrite = getWriteFile('members.json');
+$members = file_exists($membersFileRead) ? json_decode(file_get_contents($membersFileRead), true) : [];
 
 // Handle form submission
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -19,7 +20,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 'created_at' => date('Y-m-d H:i:s')
             ];
             $members[] = $newMember;
-            file_put_contents($membersFile, json_encode($members, JSON_PRETTY_PRINT));
+            file_put_contents($membersFileWrite, json_encode($members, JSON_PRETTY_PRINT));
             header('Location: /members?success=added');
             exit;
         } elseif ($_POST['action'] === 'delete') {
@@ -27,7 +28,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $members = array_filter($members, function($m) use ($id) {
                 return $m['id'] !== $id;
             });
-            file_put_contents($membersFile, json_encode(array_values($members), JSON_PRETTY_PRINT));
+            file_put_contents($membersFileWrite, json_encode(array_values($members), JSON_PRETTY_PRINT));
             header('Location: /members?success=deleted');
             exit;
         } elseif ($_POST['action'] === 'toggle') {
@@ -38,7 +39,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     break;
                 }
             }
-            file_put_contents($membersFile, json_encode($members, JSON_PRETTY_PRINT));
+            file_put_contents($membersFileWrite, json_encode($members, JSON_PRETTY_PRINT));
             header('Location: /members?success=toggled');
             exit;
         }

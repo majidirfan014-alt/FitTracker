@@ -2,11 +2,12 @@
 session_start();
 require_once __DIR__ . '/helpers.php';
 
-$membersFile = getDataFile('members.json');
-$workoutFile = getDataFile('workouts.json');
+$membersFile = getReadFile('members.json');
+$workoutFileRead = getReadFile('workouts.json');
+$workoutFileWrite = getWriteFile('workouts.json');
 
 $members = file_exists($membersFile) ? json_decode(file_get_contents($membersFile), true) : [];
-$workouts = file_exists($workoutFile) ? json_decode(file_get_contents($workoutFile), true) : [];
+$workouts = file_exists($workoutFileRead) ? json_decode(file_get_contents($workoutFileRead), true) : [];
 
 $activeMembers = array_filter($members, function($m) {
     return $m['status'] === 'active';
@@ -155,7 +156,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             return $w['id'] !== $deleteId;
         });
         $workouts = array_values($workouts);
-        file_put_contents($workoutFile, json_encode($workouts, JSON_PRETTY_PRINT));
+        file_put_contents($workoutFileWrite, json_encode($workouts, JSON_PRETTY_PRINT));
         header('Location: /workout?success=deleted');
         exit;
     }
@@ -200,7 +201,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             'created_at' => date('Y-m-d H:i:s')
         ];
         $workouts[] = $newWorkout;
-        file_put_contents($workoutFile, json_encode($workouts, JSON_PRETTY_PRINT));
+        file_put_contents($workoutFileWrite, json_encode($workouts, JSON_PRETTY_PRINT));
 
         $result = [
             'workout_type' => $workoutType,
