@@ -14,6 +14,7 @@ $activeMembers = array_filter($members, function($m) {
 
 $selectedMember = $_GET['member_id'] ?? '';
 $dateFrom = $_GET['date_from'] ?? date('Y-m-d');
+$dateTo = $_GET['date_to'] ?? date('Y-m-d');
 
 $filteredWorkouts = $workouts;
 if ($selectedMember) {
@@ -21,8 +22,8 @@ if ($selectedMember) {
         return $w['member_id'] == $selectedMember;
     });
 }
-$filteredWorkouts = array_filter($filteredWorkouts, function($w) use ($dateFrom) {
-    return $w['date'] == $dateFrom;
+$filteredWorkouts = array_filter($filteredWorkouts, function($w) use ($dateFrom, $dateTo) {
+    return $w['date'] >= $dateFrom && $w['date'] <= $dateTo;
 });
 usort($filteredWorkouts, function($a, $b) {
     return strtotime($a['date']) - strtotime($b['date']);
@@ -222,7 +223,7 @@ $fatInfo = getFatInfo($latestFat, $gender);
         <div class="card mb-3 no-print">
             <div class="card-body py-2">
                 <form method="GET" class="row g-2 align-items-end">
-                    <div class="col-md-4">
+                    <div class="col-md-3">
                         <label class="form-label mb-1" style="font-size:0.85rem">Member</label>
                         <select class="form-select form-select-sm" name="member_id">
                             <option value="">-- Semua Member --</option>
@@ -233,9 +234,13 @@ $fatInfo = getFatInfo($latestFat, $gender);
                             <?php endforeach; ?>
                         </select>
                     </div>
-                    <div class="col-md-4">
-                        <label class="form-label mb-1" style="font-size:0.85rem">Tanggal Latihan</label>
+                    <div class="col-md-3">
+                        <label class="form-label mb-1" style="font-size:0.85rem">Tanggal Dari</label>
                         <input type="date" class="form-control form-control-sm" name="date_from" value="<?= $dateFrom ?>">
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label mb-1" style="font-size:0.85rem">Tanggal Sampai</label>
+                        <input type="date" class="form-control form-control-sm" name="date_to" value="<?= $dateTo ?>">
                     </div>
                     <div class="col-md-2">
                         <button type="submit" class="btn btn-primary btn-sm w-100"><i class="bi bi-search"></i> Filter</button>
@@ -256,7 +261,7 @@ $fatInfo = getFatInfo($latestFat, $gender);
                         <?php endif; ?>
                     </h4>
                     <p class="mb-1">
-                        Tanggal: <?= $dateFrom ? date('d M Y', strtotime($dateFrom)) : '-' ?>
+                        Periode: <?= $dateFrom ? date('d M Y', strtotime($dateFrom)) : '-' ?> — <?= $dateTo ? date('d M Y', strtotime($dateTo)) : '-' ?>
                     </p>
                     <?php if ($memberInfo): ?>
                         <p class="mb-0 opacity-75" style="font-size:0.85rem">

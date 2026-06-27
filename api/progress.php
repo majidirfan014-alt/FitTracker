@@ -50,6 +50,11 @@ $typeDistribution = [];
 foreach ($workouts as $w) {
     $typeDistribution[$w['workout_type']] = ($typeDistribution[$w['workout_type']] ?? 0) + 1;
 }
+
+// Sort workouts by date descending for history
+usort($workouts, function($a, $b) {
+    return strtotime($b['date']) - strtotime($a['date']);
+});
 ?>
 <!DOCTYPE html>
 <html lang="id">
@@ -253,6 +258,81 @@ foreach ($workouts as $w) {
                                     </div>
                                 </div>
                             <?php endforeach; ?>
+                        <?php endif; ?>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Riwayat Latihan Terakhir -->
+        <div class="row">
+            <div class="col-12 mb-4">
+                <div class="card">
+                    <div class="card-header bg-white d-flex justify-content-between align-items-center">
+                        <h5 class="mb-0"><i class="bi bi-clock-history"></i> Riwayat Latihan Terakhir</h5>
+                        <span class="badge bg-primary"><?= count($workouts) ?> sesi</span>
+                    </div>
+                    <div class="card-body">
+                        <?php if (empty($workouts)): ?>
+                            <div class="text-center py-5">
+                                <i class="bi bi-clipboard-x fs-1 text-muted"></i>
+                                <h5 class="mt-3">Belum ada data latihan</h5>
+                                <p class="text-muted">Data latihan akan muncul setelah input latihan</p>
+                            </div>
+                        <?php else: ?>
+                            <div class="table-responsive">
+                                <table class="table table-hover">
+                                    <thead>
+                                        <tr>
+                                            <th>#</th>
+                                            <th>Tanggal</th>
+                                            <th>Nama</th>
+                                            <th>Jenis Latihan</th>
+                                            <th class="text-center">Durasi</th>
+                                            <th class="text-center">Kalori</th>
+                                            <th class="text-center">RPE</th>
+                                            <th>Intensitas</th>
+                                            <th class="text-center">BMI</th>
+                                            <th class="text-center">Body Fat</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <?php foreach ($workouts as $idx => $w):
+                                            $mName = 'Unknown';
+                                            foreach ($members as $m) {
+                                                if ($m['id'] == $w['member_id']) { $mName = $m['name']; break; }
+                                            }
+                                            $intensityClass = '';
+                                            $intensityText = '';
+                                            switch ($w['intensity'] ?? '') {
+                                                case 'low': $intensityClass = 'bg-info'; $intensityText = 'Ringan'; break;
+                                                case 'medium': $intensityClass = 'bg-warning text-dark'; $intensityText = 'Sedang'; break;
+                                                case 'high': $intensityClass = 'bg-danger'; $intensityText = 'Berat'; break;
+                                            }
+                                        ?>
+                                            <tr>
+                                                <td class="text-muted"><?= $idx + 1 ?></td>
+                                                <td><?= date('d M Y', strtotime($w['date'])) ?></td>
+                                                <td>
+                                                    <div class="d-flex align-items-center">
+                                                        <div class="member-photo me-2" style="width:30px;height:30px;font-size:0.75rem">
+                                                            <?= strtoupper(substr($mName, 0, 1)) ?>
+                                                        </div>
+                                                        <?= htmlspecialchars($mName) ?>
+                                                    </div>
+                                                </td>
+                                                <td><span class="badge workout-<?= strtolower(str_replace(' ', '', $w['workout_type'])) ?>"><?= $w['workout_type'] ?></span></td>
+                                                <td class="text-center"><?= $w['duration'] ?>m</td>
+                                                <td class="text-center fw-bold text-danger"><?= $w['calories'] ?? '-' ?></td>
+                                                <td class="text-center fw-bold"><?= $w['rpe'] ?? '-' ?>/10</td>
+                                                <td><span class="badge <?= $intensityClass ?>"><?= $intensityText ?></span></td>
+                                                <td class="text-center"><?= $w['bmi'] ?? '-' ?></td>
+                                                <td class="text-center"><?= $w['body_fat'] ?? '-' ?>%</td>
+                                            </tr>
+                                        <?php endforeach; ?>
+                                    </tbody>
+                                </table>
+                            </div>
                         <?php endif; ?>
                     </div>
                 </div>
