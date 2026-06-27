@@ -22,8 +22,9 @@ function getReadFile($filename) {
     if (file_exists($file)) {
         return $file;
     }
-    $srcFile = __DIR__ . '/../data/' . $filename;
-    if (file_exists($srcFile)) {
+    $srcDir = __DIR__ . '/../data';
+    $srcFile = $srcDir . '/' . $filename;
+    if (file_exists($srcFile) && $srcFile !== $file) {
         copy($srcFile, $file);
     }
     return $file;

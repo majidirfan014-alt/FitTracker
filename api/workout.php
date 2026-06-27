@@ -151,12 +151,14 @@ $result = [];
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (isset($_POST['action']) && $_POST['action'] === 'delete') {
-        $deleteId = $_POST['workout_id'];
-        $workouts = array_filter($workouts, function($w) use ($deleteId) {
-            return $w['id'] !== $deleteId;
-        });
-        $workouts = array_values($workouts);
-        file_put_contents($workoutFileWrite, json_encode($workouts, JSON_PRETTY_PRINT));
+        $deleteId = $_POST['workout_id'] ?? '';
+        if ($deleteId) {
+            $workouts = array_filter($workouts, function($w) use ($deleteId) {
+                return $w['id'] !== $deleteId;
+            });
+            $workouts = array_values($workouts);
+            file_put_contents($workoutFileWrite, json_encode($workouts, JSON_PRETTY_PRINT));
+        }
         header('Location: /workout?success=deleted');
         exit;
     }
@@ -207,6 +209,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             'workout_type' => $workoutType,
             'duration' => $duration,
             'calories' => $calories,
+            'date' => $date,
             'intensity' => getIntensityLabel($rpe),
             'intensity_class' => $intensity === 'low' ? 'bg-info' : ($intensity === 'medium' ? 'bg-warning' : 'bg-danger'),
             'fat' => $fat,
@@ -443,8 +446,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                             </thead>
                             <tbody>
                                 <?php 
-                                $recentWorkouts = array_slice($workouts, -15, 15, true);
-                                foreach (array_reverse($recentWorkouts, true) as $wid => $workout): 
+                                $sortedWorkouts = $workouts;
+                                usort($sortedWorkouts, function($a, $b) {
+                                    return strtotime($b['date']) - strtotime($a['date']);
+                                });
+                                $recentWorkouts = array_slice($sortedWorkouts, 0, 15);
+                                foreach ($recentWorkouts as $workout): 
                                     $memberName = 'Unknown';
                                     $memberGender = 'male';
                                     foreach ($members as $m) {

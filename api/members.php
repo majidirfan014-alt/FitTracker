@@ -310,8 +310,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
 
         function viewMember(id) {
-            // Can be extended to show member details in a modal
-            alert('Detail member ID: ' + id);
+            window.location.href = '/member-detail?id=' + id;
         }
     </script>
 </body>

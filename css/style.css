@@ -142,10 +142,10 @@ footer {
 /* Workout Type Colors */
 .workout-strength { background-color: #0d6efd; color: white; }
 .workout-strengthtraining { background-color: #0d6efd; color: white; }
-.workout-cardio { background-color: #0d6efd; color: white; }
-.workout-flexibility { background-color: #0d6efd; color: white; }
-.workout-hiit { background-color: #0d6efd; color: white; }
-.workout-lainnya { background-color: #0d6efd; color: white; }
+.workout-cardio { background-color: #dc3545; color: white; }
+.workout-flexibility { background-color: #198754; color: white; }
+.workout-hiit { background-color: #fd7e14; color: white; }
+.workout-lainnya { background-color: #6c757d; color: white; }
 
 /* Dashboard Specific */
 .welcome-section {

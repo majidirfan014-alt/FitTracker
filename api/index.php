@@ -4,24 +4,21 @@ require_once __DIR__ . '/helpers.php';
 
 // Load data from JSON files
 $membersFile = getReadFile('members.json');
-$progressFile = getReadFile('progress.json');
+$workoutsFile = getReadFile('workouts.json');
 
 $members = file_exists($membersFile) ? json_decode(file_get_contents($membersFile), true) : [];
-$progress = file_exists($progressFile) ? json_decode(file_get_contents($progressFile), true) : [];
+$workouts = file_exists($workoutsFile) ? json_decode(file_get_contents($workoutsFile), true) : [];
 
 // Calculate statistics
 $totalMembers = count($members);
 $activeMembers = 0;
-$totalSessions = 0;
+$totalSessions = count($workouts);
+$totalCalories = array_sum(array_column($workouts, 'calories'));
 
 foreach ($members as $member) {
     if ($member['status'] === 'active') {
         $activeMembers++;
     }
-}
-
-foreach ($progress as $p) {
-    $totalSessions += $p['sessions'] ?? 0;
 }
 ?>
 <!DOCTYPE html>
@@ -121,14 +118,14 @@ foreach ($progress as $p) {
                 </div>
             </div>
             <div class="col-md-3 col-sm-6 mb-3">
-                <div class="card stat-card bg-info text-white">
+                <div class="card stat-card bg-danger text-white">
                     <div class="card-body">
                         <div class="d-flex justify-content-between align-items-center">
                             <div>
-                                <h6 class="card-subtitle mb-2 opacity-75">Rata-rata/Sesi</h6>
-                                <h2 class="card-title mb-0"><?= $totalMembers > 0 ? round($totalSessions / $totalMembers, 1) : 0 ?></h2>
+                                <h6 class="card-subtitle mb-2 opacity-75">Total Kalori</h6>
+                                <h2 class="card-title mb-0"><?= number_format($totalCalories) ?></h2>
                             </div>
-                            <i class="bi bi-graph-up-arrow fs-1 opacity-50"></i>
+                            <i class="bi bi-fire fs-1 opacity-50"></i>
                         </div>
                     </div>
                 </div>
@@ -145,12 +142,12 @@ foreach ($progress as $p) {
                     <div class="card-body">
                         <div class="row">
                             <div class="col-md-3 col-6 mb-2">
-                                <a href="members.php?action=add" class="btn btn-outline-primary w-100">
+                                <a href="/members" class="btn btn-outline-primary w-100">
                                     <i class="bi bi-person-plus"></i> Tambah Member
                                 </a>
                             </div>
                             <div class="col-md-3 col-6 mb-2">
-                                <a href="workout.php?action=add" class="btn btn-outline-success w-100">
+                                <a href="/workout" class="btn btn-outline-success w-100">
                                     <i class="bi bi-plus-circle"></i> Input Latihan
                                 </a>
                             </div>
@@ -226,7 +223,7 @@ foreach ($progress as $p) {
                         <a href="/workout" class="btn btn-sm btn-outline-success">Lihat Semua</a>
                     </div>
                     <div class="card-body">
-                        <?php if (empty($progress)): ?>
+                        <?php if (empty($workouts)): ?>
                             <div class="text-center text-muted py-4">
                                 <i class="bi bi-clipboard-x fs-1"></i>
                                 <p class="mt-2">Belum ada data latihan</p>
@@ -238,17 +235,17 @@ foreach ($progress as $p) {
                                         <tr>
                                             <th>Member</th>
                                             <th>Jenis</th>
-                                            <th>Sesi</th>
+                                            <th>Kalori</th>
                                             <th>Tanggal</th>
                                         </tr>
                                     </thead>
                                     <tbody>
                                         <?php 
-                                        $recentProgress = array_slice($progress, -5, 5, true);
-                                        foreach (array_reverse($recentProgress, true) as $id => $p): 
+                                        $recentWorkouts = array_slice($workouts, -5, 5, true);
+                                        foreach (array_reverse($recentWorkouts, true) as $id => $w): 
                                             $memberName = 'Unknown';
                                             foreach ($members as $m) {
-                                                if ($m['id'] == $p['member_id']) {
+                                                if ($m['id'] == $w['member_id']) {
                                                     $memberName = $m['name'];
                                                     break;
                                                 }
@@ -256,9 +253,9 @@ foreach ($progress as $p) {
                                         ?>
                                             <tr>
                                                 <td><?= htmlspecialchars($memberName) ?></td>
-                                                <td><span class="badge workout-<?= strtolower(str_replace(' ', '', $p['workout_type'])) ?>"><?= htmlspecialchars($p['workout_type']) ?></span></td>
-                                                <td><?= $p['sessions'] ?></td>
-                                                <td><?= date('d/m/Y', strtotime($p['date'])) ?></td>
+                                                <td><span class="badge workout-<?= strtolower(str_replace(' ', '', $w['workout_type'])) ?>"><?= htmlspecialchars($w['workout_type']) ?></span></td>
+                                                <td><?= $w['calories'] ?? '-' ?> kcal</td>
+                                                <td><?= date('d/m/Y', strtotime($w['date'])) ?></td>
                                             </tr>
                                         <?php endforeach; ?>
                                     </tbody>
