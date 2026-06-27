@@ -1,8 +1,9 @@
 <?php
 session_start();
+require_once __DIR__ . '/helpers.php';
 
-$membersFile = __DIR__ . '/../data/members.json';
-$workoutFile = __DIR__ . '/../data/workouts.json';
+$membersFile = getDataFile('members.json');
+$workoutFile = getDataFile('workouts.json');
 
 $members = file_exists($membersFile) ? json_decode(file_get_contents($membersFile), true) : [];
 $workouts = file_exists($workoutFile) ? json_decode(file_get_contents($workoutFile), true) : [];

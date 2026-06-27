@@ -1,9 +1,10 @@
 <?php
 session_start();
+require_once __DIR__ . '/helpers.php';
 
 // Load data from JSON files
-$membersFile = __DIR__ . '/../data/members.json';
-$progressFile = __DIR__ . '/../data/progress.json';
+$membersFile = getDataFile('members.json');
+$progressFile = getDataFile('progress.json');
 
 $members = file_exists($membersFile) ? json_decode(file_get_contents($membersFile), true) : [];
 $progress = file_exists($progressFile) ? json_decode(file_get_contents($progressFile), true) : [];
