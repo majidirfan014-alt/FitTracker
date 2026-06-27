@@ -1,0 +1,26 @@
+{
+  "builds": [
+    {
+      "src": "**/*.php",
+      "use": "@vercel/php"
+    },
+    {
+      "src": "css/**",
+      "use": "@vercel/static"
+    },
+    {
+      "src": "*.png",
+      "use": "@vercel/static"
+    },
+    {
+      "src": "data/**",
+      "use": "@vercel/static"
+    }
+  ],
+  "routes": [
+    { "src": "/css/(.*)", "dest": "/css/$1" },
+    { "src": "/data/(.*)", "dest": "/data/$1" },
+    { "src": "/(.*\\.png)", "dest": "/$1" },
+    { "src": "/(.*)", "dest": "/$1.php" }
+  ]
+}
