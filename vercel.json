@@ -1,26 +1,23 @@
 {
-  "builds": [
-    {
-      "src": "**/*.php",
-      "use": "@vercel/php"
-    },
-    {
-      "src": "css/**",
-      "use": "@vercel/static"
-    },
-    {
-      "src": "*.png",
-      "use": "@vercel/static"
-    },
-    {
-      "src": "data/**",
-      "use": "@vercel/static"
+  "functions": {
+    "api/*.php": {
+      "runtime": "vercel-php@0.9.0"
     }
-  ],
+  },
   "routes": [
     { "src": "/css/(.*)", "dest": "/css/$1" },
     { "src": "/data/(.*)", "dest": "/data/$1" },
     { "src": "/(.*\\.png)", "dest": "/$1" },
-    { "src": "/(.*)", "dest": "/$1.php" }
+    { "src": "/members$", "dest": "/api/members.php" },
+    { "src": "/members\\?(.*)", "dest": "/api/members.php?$1" },
+    { "src": "/workout$", "dest": "/api/workout.php" },
+    { "src": "/workout\\?(.*)", "dest": "/api/workout.php?$1" },
+    { "src": "/progress$", "dest": "/api/progress.php" },
+    { "src": "/progress\\?(.*)", "dest": "/api/progress.php?$1" },
+    { "src": "/reports$", "dest": "/api/reports.php" },
+    { "src": "/reports\\?(.*)", "dest": "/api/reports.php?$1" },
+    { "src": "/member-detail$", "dest": "/api/member-detail.php" },
+    { "src": "/member-detail\\?(.*)", "dest": "/api/member-detail.php?$1" },
+    { "src": "/(.*)", "dest": "/api/index.php" }
   ]
 }
