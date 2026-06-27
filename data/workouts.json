@@ -1,0 +1,34 @@
+[
+    {
+        "id": "6a2bce3859143",
+        "member_id": "6a2bcd78e9d69",
+        "workout_type": "Adaptasi Anatomi",
+        "duration": 90,
+        "calories": 545,
+        "intensity": "medium",
+        "rpe": 5,
+        "height": 159,
+        "weight": 72.6,
+        "age": 39,
+        "bmi": 28.7,
+        "body_fat": 38,
+        "date": "2026-06-12",
+        "created_at": "2026-06-12 09:15:36"
+    },
+    {
+        "id": "6a2f8c456d7e7",
+        "member_id": "6a2bcd78e9d69",
+        "workout_type": "HIIT",
+        "duration": 90,
+        "calories": 1128,
+        "intensity": "high",
+        "rpe": 7,
+        "height": 159,
+        "weight": 72,
+        "age": 39,
+        "bmi": 28.5,
+        "body_fat": 37.8,
+        "date": "2026-06-15",
+        "created_at": "2026-06-15 05:23:17"
+    }
+]
