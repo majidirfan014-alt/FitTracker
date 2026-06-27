@@ -17,14 +17,14 @@ function getWriteFile($filename) {
 }
 
 function getReadFile($filename) {
-    $dataDir = __DIR__ . '/../data';
-    $dataFile = $dataDir . '/' . $filename;
-    if (file_exists($dataFile)) {
-        return $dataFile;
+    $dir = getDataDir();
+    $file = $dir . '/' . $filename;
+    if (file_exists($file)) {
+        return $file;
     }
-    $tmpFile = '/tmp/fittrack_data/' . $filename;
-    if (file_exists($tmpFile)) {
-        return $tmpFile;
+    $srcFile = __DIR__ . '/../data/' . $filename;
+    if (file_exists($srcFile)) {
+        copy($srcFile, $file);
     }
-    return $dataFile;
+    return $file;
 }
