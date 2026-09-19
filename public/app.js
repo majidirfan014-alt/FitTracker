@@ -1,12 +1,37 @@
 // ===== DATA STORE =====
-const DB={
+var DB={
   getUsers(){return JSON.parse(localStorage.getItem('al_users')||'[]')},
-  setUsers(u){localStorage.setItem('al_users',JSON.stringify(u))},
+  setUsers(u){localStorage.setItem('al_users',JSON.stringify(u));FS.sync('users',u)},
   getLogs(){return JSON.parse(localStorage.getItem('al_logs')||'[]')},
-  setLogs(l){localStorage.setItem('al_logs',JSON.stringify(l))},
+  setLogs(l){localStorage.setItem('al_logs',JSON.stringify(l));FS.sync('logs',l)},
   getSession(){return JSON.parse(localStorage.getItem('al_sess')||'null')},
   setSession(s){localStorage.setItem('al_sess',JSON.stringify(s))},
   clearSession(){localStorage.removeItem('al_sess')}
+};
+// ===== FIRESTORE SYNC =====
+var FS={
+  sync:function(col,data){
+    try{db.collection('fittracker').doc(col).set({data:JSON.parse(JSON.stringify(data)),updated:Date.now()})}
+    catch(e){console.warn('FS sync error:',e)}
+  },
+  load:function(col){
+    return db.collection('fittracker').doc(col).get().then(function(doc){
+      if(doc.exists&&doc.data().data)return doc.data().data;
+      return null;
+    }).catch(function(e){console.warn('FS load error:',e);return null})
+  },
+  init:function(){
+    var localUsers=DB.getUsers();
+    var localLogs=DB.getLogs();
+    if(localUsers.length>0){FS.sync('users',localUsers)}
+    if(localLogs.length>0){FS.sync('logs',localLogs)}
+    return Promise.all([FS.load('users'),FS.load('logs')]).then(function(results){
+      var fsUsers=results[0],fsLogs=results[1];
+      if(fsUsers&&fsUsers.length>localUsers.length){DB.setUsers(fsUsers);DB.setLogs(fsLogs||[])}
+      else if(fsUsers&&fsUsers.length>0&&localUsers.length===0){DB.setUsers(fsUsers);DB.setLogs(fsLogs||[])}
+      return true;
+    })
+  }
 };
 function hash(s){let h=0;for(let i=0;i<s.length;i++){h=((h<<5)-h)+s.charCodeAt(i);h|=0}return'H'+Math.abs(h).toString(36)}
 function uid(){return Date.now().toString(36)+Math.random().toString(36).slice(2,7)}
@@ -418,5 +443,8 @@ function makeLogCharts(data){
   charts.l5=new Chart(document.getElementById('logC5'),{type:'bar',data:{labels:labels,datasets:[{label:'Fatigue Score',data:data.map(function(l){return parseFloat(fatigueScore(l).s)}),backgroundColor:data.map(function(l){var z=fatigueScore(l).z;return z==='red'?'#ef4444':z==='yellow'?'#eab308':z==='blue'?'#3b82f6':'#22c55e'})}]},options:{responsive:true,plugins:{legend:{display:false}},scales:{y:{beginAtZero:true,max:10}}}});
 }
 // ===== INIT =====
-render();
+seedDemo();render();
+FS.init().then(function(){
+  seedDemo();render();
+}).catch(function(e){console.warn('Firestore init failed, using local data',e)});
 
