@@ -206,11 +206,21 @@ function buildAdminTable(users,logs,today){
     '<td class="py-3 font-semibold">'+(tl?tl.rpe:'-')+'</td>'+
     '<td class="py-3">'+(fs?'<span class="badge '+fs.c+'">'+fs.l+'</span>':'-')+'</td>'+
     '<td class="py-3"><button class="btn btn-sm btn-secondary" onclick="nav(\'view-user\',{userId:\''+u.id+'\'})">Lihat</button> '+
-    '<button class="btn btn-sm btn-primary" onclick="nav(\'input\',{userId:\''+u.id+'\'})">Input</button></td></tr>';
+    '<button class="btn btn-sm btn-primary" onclick="nav(\'input\',{userId:\''+u.id+'\'})">Input</button> '+
+    '<button class="btn btn-sm" style="background:#fef2f2;color:#991b1b;border:1px solid #fecaca" onclick="deleteUser(\''+u.id+'\',\''+u.name.replace(/'/g,"\\'")+'\')">Hapus</button></td></tr>';
   }
   return '<div class="overflow-x-auto"><table class="w-full text-sm"><thead><tr class="text-left text-gray-500 border-b">'+
   '<th class="pb-3 font-medium">Nama</th><th class="pb-3 font-medium">Usia</th><th class="pb-3 font-medium">Hari Ini</th><th class="pb-3 font-medium">RPE</th><th class="pb-3 font-medium">Fatigue</th><th class="pb-3 font-medium">Aksi</th></tr></thead><tbody>'+
   rows+'</tbody></table></div>';
+}
+function deleteUser(uid,name){
+  if(!confirm('Hapus data user "'+name+'" dan semua log latihannya?'))return;
+  var users=DB.getUsers().filter(function(u){return u.id!==uid});
+  DB.setUsers(users);
+  var logs=DB.getLogs().filter(function(l){return l.user_id!==uid});
+  DB.setLogs(logs);
+  toast('User "'+name+'" berhasil dihapus.');
+  render();
 }
 // ===== INPUT FORM =====
 function pgInputForm(){
