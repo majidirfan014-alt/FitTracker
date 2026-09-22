@@ -23,12 +23,28 @@ var FS={
   init:function(){
     var localUsers=DB.getUsers();
     var localLogs=DB.getLogs();
-    if(localUsers.length>0){FS.sync('users',localUsers)}
-    if(localLogs.length>0){FS.sync('logs',localLogs)}
     return Promise.all([FS.load('users'),FS.load('logs')]).then(function(results){
       var fsUsers=results[0],fsLogs=results[1];
-      if(fsUsers&&fsUsers.length>localUsers.length){DB.setUsers(fsUsers);DB.setLogs(fsLogs||[])}
-      else if(fsUsers&&fsUsers.length>0&&localUsers.length===0){DB.setUsers(fsUsers);DB.setLogs(fsLogs||[])}
+      if(fsUsers){
+        var merged=localUsers.slice();
+        var localIds=localUsers.map(function(u){return u.id});
+        for(var i=0;i<fsUsers.length;i++){
+          if(localIds.indexOf(fsUsers[i].id)===-1) merged.push(fsUsers[i]);
+        }
+        DB.setUsers(merged);
+      } else if(localUsers.length>0){
+        FS.sync('users',localUsers);
+      }
+      if(fsLogs){
+        var merged=localLogs.slice();
+        var localIds=localLogs.map(function(l){return l.id});
+        for(var i=0;i<fsLogs.length;i++){
+          if(localIds.indexOf(fsLogs[i].id)===-1) merged.push(fsLogs[i]);
+        }
+        DB.setLogs(merged);
+      } else if(localLogs.length>0){
+        FS.sync('logs',localLogs);
+      }
       return true;
     })
   }
@@ -455,6 +471,6 @@ function makeLogCharts(data){
 // ===== INIT =====
 seedDemo();render();
 FS.init().then(function(){
-  seedDemo();render();
+  render();
 }).catch(function(e){console.warn('Firestore init failed, using local data',e)});
 
